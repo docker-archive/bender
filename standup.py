@@ -45,12 +45,16 @@ class Standup(object):
 
     def _cmd_help(self, target, nick, args):
         if not args:
-            self._send_msg(target, nick, ('My commands are: start, skip, park.'
+            self._send_msg(target, nick, ('My commands are: start, stop, next, skip, park.'
                 ' Ask me "help <command>" for what they do.'))
             return
         cmd = args[0]
         if cmd == 'start':
             self._send_msg(target, nick, 'start: start a standup')
+        elif cmd == 'stop':
+            self._send_msg(target, nick, 'stop: stop a standup')
+        elif cmd == 'next':
+            self._send_msg(target, nick, 'next: when you are done talking')
         elif cmd == 'skip':
             self._send_msg(target, nick, 'skip <nick>: skip a person')
         elif cmd == 'park':
