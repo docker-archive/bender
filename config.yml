@@ -1,0 +1,13 @@
+
+network: 'irc.freenode.net'
+port: 6667
+channels: '#irclib'
+nick: 'bender'
+name: 'DotCloud bot'
+channel: '#dotcloud-bender'
+
+standups:
+    core:
+        primary_channel: '#dotcloud-bender'
+        standup_channel: '#dotcloud-scrum-standup'
+        warmup_duration: 60
