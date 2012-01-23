@@ -120,7 +120,7 @@ class Standup(object):
         if nick and nick != self._current_user:
             self._send_msg(target, nick, 'Only {0} can say "next".'.format(self._current_user))
             return
-        self._user_list.pop()
+        self._user_list.pop(0)
         if not self._user_list:
             self._cmd_stop()
             return
