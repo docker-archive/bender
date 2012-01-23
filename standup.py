@@ -92,7 +92,8 @@ class Standup(object):
             if event.target() != self._config['standup_channel']:
                 return
             nick = event.source().split('!')[0]
-            nick_list.append(nick)
+            if nick not in nick_list:
+                nick_list.append(nick)
         self._irc.add_global_handler('pubmsg', gather_reply)
         def start():
             self._starting = False
@@ -136,7 +137,7 @@ class Standup(object):
             # Wrong channel, ignoring
             return
         if self._owner and nick and self._owner != nick:
-            self._send_msg(target, nick, 'Only {0} can skip someone (he started the standup).'.format(nick))
+            self._send_msg(target, nick, 'Only {0} can skip someone (he started the standup).'.format(self._owner))
             return
         to_skip = args[0]
         if to_skip == self._current_user:
