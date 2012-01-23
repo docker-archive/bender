@@ -167,6 +167,7 @@ class Standup(object):
                     'Standup stopped.')
             return
         elapsed = int((time.time() - self._started) / 60)
+        self._started = None
         self._server.privmsg(self._config['standup_channel'],
                 'All done! Standup was {0} minutes.'.format(elapsed))
         if self._parking:
