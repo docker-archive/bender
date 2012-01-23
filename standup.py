@@ -1,6 +1,5 @@
 
 import time
-import shlex
 
 
 class Standup(object):
@@ -35,7 +34,7 @@ class Standup(object):
             # Ignoring command outside the standup channel
             # So we can spawn several standup easily
             return
-        args = shlex.split(event.arguments()[0])
+        args = [arg for arg in event.arguments()[0].split(' ') if arg]
         nick = event.source().split('!')[0]
         args.pop(0)
         f_cmd = '_cmd_' + args[0]
