@@ -158,7 +158,7 @@ class Standup(object):
             self._send_msg(target, nick, 'No standup in progress.')
             return
         if self._owner and nick and self._owner != nick:
-            self._send_msg(target, nick, 'Only {0} can stop the standup (he started it).'.format(nick))
+            self._send_msg(target, nick, 'Only {0} can stop the standup (he started it).'.format(self._owner))
             return
         self._in_progress = False
         self._user_list = None
