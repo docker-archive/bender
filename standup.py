@@ -37,6 +37,8 @@ class Standup(object):
         args = [arg for arg in event.arguments()[0].split(' ') if arg]
         nick = event.source().split('!')[0]
         args.pop(0)
+        if not args:
+            return
         f_cmd = '_cmd_' + args[0]
         if hasattr(self, f_cmd):
             args.pop(0)
