@@ -45,14 +45,14 @@ class Standup(object):
             getattr(self, f_cmd)(target, nick, args)
 
     def _cmd_help(self, target, nick, args):
-        options = {
-                'start': 'start: start a standup',
-                'stop': 'stop: stop a standup',
-                'next': 'next: when you are done talking',
-                'skip': 'skip <nick>: skip a person',
-                'add': 'add <nick>: Add a person to a standup',
-                'park': 'park <topic>: park a topic for later'
-                }
+        """ Display the help menu """
+        options = {}
+        for meth in dir(self):
+            if not meth.startswith('_cmd_'):
+                continue
+            cmeth = getattr(self, meth)
+            doc = cmeth.__doc__.split('\n')[0].strip() if cmeth.__doc__ else '<undocumented>'
+            options[meth[5:]] = doc
         if not args:
             self._send_msg(target, nick, ('My commands are: {0}. Ask me '
                 '"help <command>" for what they do.').format(', '.join(options.keys())))
@@ -64,7 +64,7 @@ class Standup(object):
         self._send_msg(target, nick, 'WTF?! Try "help"')
 
     def _cmd_start(self, target, nick, args):
-        """ This function starts a standup
+        """ start: start a standup
 
         1/ all users on the standup channel are asked to say something
         2/ all replies are gathered for 1 min
@@ -116,7 +116,26 @@ class Standup(object):
                     'You start.')
         self._irc.execute_at(time.time() + self._config['warmup_duration'], start)
 
+    def _cmd_add(self, target, nick, args):
+        """ Add a person to the standup (I won't check if the nick exists on the server) """
+        if self._in_progress is False:
+            self._send_msg(target, nick, 'No standup in progress.')
+            return
+        if self._owner and nick and self._owner != nick:
+            self._send_msg(target, nick, 'Only {0} can add someone (he started the standup).'.format(self._owner))
+            return
+        if not args:
+            return
+        to_add = args[0].lower()
+        if to_add in self._user_list:
+            self._send_msg(target, nick, '{0} is already part of the Standup.'.format(to_add))
+            return
+        self._user_list.append(to_add)
+        # FIXME: Check if to_add exists for real
+        self._send_msg(target, nick, 'Added {0}.'.format(to_add))
+
     def _cmd_next(self, target=None, nick=None, args=None):
+        """ next: when you are done talking """
         if self._in_progress is False:
             self._send_msg(target, nick, 'No standup in progress.')
             return
@@ -132,6 +151,7 @@ class Standup(object):
                 'You\'re next.')
 
     def _cmd_skip(self, target, nick, args):
+        """ skip <nick>: skip a person """
         if self._in_progress is False:
             self._send_msg(target, nick, 'No standup in progress.')
             return
@@ -141,7 +161,9 @@ class Standup(object):
         if self._owner and nick and self._owner != nick:
             self._send_msg(target, nick, 'Only {0} can skip someone (he started the standup).'.format(self._owner))
             return
-        to_skip = args[0]
+        if not args:
+            return
+        to_skip = args[0].lower()
         if to_skip == self._current_user:
             self._cmd_next()
             return
@@ -149,6 +171,7 @@ class Standup(object):
         self._send_msg(target, nick, '{0} has been removed from the standup.'.format(to_skip))
 
     def _cmd_park(self, target, nick, args):
+        """ park <topic>: park a topic for later """
         if self._in_progress is False:
             self._send_msg(target, nick, 'No standup in progress.')
             return
@@ -156,6 +179,7 @@ class Standup(object):
         self._send_msg(target, nick, 'Parked.')
 
     def _cmd_stop(self, target=None, nick=None, args=None):
+        """ stop: stop a standup """
         if self._in_progress is False:
             self._send_msg(target, nick, 'No standup in progress.')
             return
