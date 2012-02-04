@@ -39,29 +39,29 @@ class Standup(object):
         args.pop(0)
         if not args:
             return
-        f_cmd = '_cmd_' + args[0]
+        f_cmd = '_cmd_' + args[0].lower()
         if hasattr(self, f_cmd):
             args.pop(0)
             getattr(self, f_cmd)(target, nick, args)
 
     def _cmd_help(self, target, nick, args):
+        options = {
+                'start': 'start: start a standup',
+                'stop': 'stop: stop a standup',
+                'next': 'next: when you are done talking',
+                'skip': 'skip <nick>: skip a person',
+                'add': 'add <nick>: Add a person to a standup',
+                'park': 'park <topic>: park a topic for later'
+                }
         if not args:
-            self._send_msg(target, nick, ('My commands are: start, stop, next, skip, park.'
-                ' Ask me "help <command>" for what they do.'))
+            self._send_msg(target, nick, ('My commands are: {0}. Ask me '
+                '"help <command>" for what they do.').format(', '.join(options.keys())))
             return
-        cmd = args[0]
-        if cmd == 'start':
-            self._send_msg(target, nick, 'start: start a standup')
-        elif cmd == 'stop':
-            self._send_msg(target, nick, 'stop: stop a standup')
-        elif cmd == 'next':
-            self._send_msg(target, nick, 'next: when you are done talking')
-        elif cmd == 'skip':
-            self._send_msg(target, nick, 'skip <nick>: skip a person')
-        elif cmd == 'park':
-            self._send_msg(target, nick, 'park <topic>: park a topic for later')
-        else:
-            self._send_msg(target, nick, 'WTF?! Try "help"')
+        cmd = args[0].lower()
+        if cmd in options:
+            self._send_msg(target, nick, options[cmd])
+            return
+        self._send_msg(target, nick, 'WTF?! Try "help"')
 
     def _cmd_start(self, target, nick, args):
         """ This function starts a standup
