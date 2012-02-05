@@ -1,11 +1,16 @@
 
+import os
 import time
+import archives
 
 
 class Standup(object):
 
     def __init__(self, name, irc, server, global_config, config):
         self._name = name
+        archives_path = os.path.join(os.path.expanduser(global_config['logs']),
+                'standup_archives')
+        self._archives = archives.Archives(archives_path, global_config['timezone'])
         self._irc = irc
         self._server = server
         self._global_config = global_config
@@ -25,6 +30,10 @@ class Standup(object):
         args = event.arguments()
         if not args:
             return
+        if self._in_progress is True and event.target() != self._config['standup_channel']:
+            # Archiving
+            nick = event.source().split('!')[0]
+            self._archives.write('{0}: {1}'.format(nick, args[0]))
         if args[0].startswith(self._global_config['nick']):
             self._direct_message(event)
 
@@ -81,6 +90,7 @@ class Standup(object):
             self._irc.remove_global_handler('namreply', list_users)
             users = event.arguments().pop().split(' ')
             users.pop(0)
+            users.remove(self._global_config['nick'])
             users = map(lambda c: c.lstrip('@+'), users)
             self._server.privmsg(self._config['standup_channel'],
                     '{0}: Please say something to be part of the standup (starting in {1} seconds)'.format(
@@ -107,6 +117,7 @@ class Standup(object):
                 self._server.privmsg(self._config['standup_channel'],
                         'Nobody replied, aborting the standup.')
                 return
+            self._archives.new(self._name)
             self._parking = []
             self._server.privmsg(self._config['standup_channel'],
                     'Let\'s start the standup with {0}'.format(', '.join(nick_list)))
@@ -130,8 +141,8 @@ class Standup(object):
         if to_add in self._user_list:
             self._send_msg(target, nick, '{0} is already part of the Standup.'.format(to_add))
             return
-        self._user_list.append(to_add)
         # FIXME: Check if to_add exists for real
+        self._user_list.append(to_add)
         self._send_msg(target, nick, 'Added {0}.'.format(to_add))
 
     def _cmd_next(self, target=None, nick=None, args=None):
@@ -175,7 +186,7 @@ class Standup(object):
         if self._in_progress is False:
             self._send_msg(target, nick, 'No standup in progress.')
             return
-        self._parking.append(' '.join(args))
+        self._parking.append('({0}) {1}'.format(nick, ' '.join(args)))
         self._send_msg(target, nick, 'Parked.')
 
     def _cmd_stop(self, target=None, nick=None, args=None):
@@ -186,22 +197,21 @@ class Standup(object):
         if self._owner and nick and self._owner != nick:
             self._send_msg(target, nick, 'Only {0} can stop the standup (he started it).'.format(self._owner))
             return
-        self._in_progress = False
-        self._user_list = None
-        self._current_user = None
-        if self._started is None:
-            self._server.privmsg(self._config['standup_channel'],
-                    'Standup stopped.')
-            return
         elapsed = int((time.time() - self._started) / 60)
         self._started = None
         self._server.privmsg(self._config['standup_channel'],
                 'All done! Standup was {0} minutes.'.format(elapsed))
+        self._user_list = None
+        self._current_user = None
+        self._in_progress = False
         if self._parking:
+            self._archives.write('Parked topics: ')
             self._server.privmsg(self._config['primary_channel'], 'Parked topics from "{0}" standup:'.format(self._name))
-            send = lambda m: self._server.privmsg(self._config['primary_channel'], '* ' + m)
+            send = lambda m: self._server.privmsg(self._config['primary_channel'], m)
             for park in self._parking:
-                send(park)
+                send('* ' + park)
+                self._archives.write('* ' + park)
+        self._archives.close()
         self._parking = False
 
     def _send_msg(self, target, nick, msg):

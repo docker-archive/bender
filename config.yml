@@ -5,6 +5,8 @@ channels: '#irclib'
 nick: 'bender'
 name: 'DotCloud bot'
 channel: '#dotcloud-bender'
+logs: '~/logs'
+timezone: 'US/Pacific'
 
 standups:
     core:
