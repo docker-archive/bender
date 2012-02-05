@@ -30,7 +30,7 @@ class Standup(object):
         args = event.arguments()
         if not args:
             return
-        if self._in_progress is True and event.target() != self._config['standup_channel']:
+        if self._in_progress is True and event.target() == self._config['standup_channel']:
             # Archiving
             nick = event.source().split('!')[0]
             self._archives.write('{0}: {1}'.format(nick, args[0]))
@@ -90,7 +90,8 @@ class Standup(object):
             self._irc.remove_global_handler('namreply', list_users)
             users = event.arguments().pop().split(' ')
             users.pop(0)
-            users.remove(self._global_config['nick'])
+            if self._global_config['nick'] in users:
+                users.remove(self._global_config['nick'])
             users = map(lambda c: c.lstrip('@+'), users)
             self._server.privmsg(self._config['standup_channel'],
                     '{0}: Please say something to be part of the standup (starting in {1} seconds)'.format(
@@ -121,10 +122,12 @@ class Standup(object):
             self._parking = []
             self._server.privmsg(self._config['standup_channel'],
                     'Let\'s start the standup with {0}'.format(', '.join(nick_list)))
+            self._archives.write('*** Starting with: {0}'.format(', '.join(nick_list)))
             self._user_list = nick_list
             self._current_user = nick_list[0]
             self._send_msg(self._config['standup_channel'], self._current_user,
                     'You start.')
+            self._archives.write('*** Current: {0}'.format(self._current_user))
         self._irc.execute_at(time.time() + self._config['warmup_duration'], start)
 
     def _cmd_add(self, target, nick, args):
@@ -160,6 +163,7 @@ class Standup(object):
         self._current_user = self._user_list[0]
         self._send_msg(self._config['standup_channel'], self._current_user,
                 'You\'re next.')
+        self._archives.write('*** Current: {0}'.format(self._current_user))
 
     def _cmd_skip(self, target, nick, args):
         """ skip <nick>: skip a person """
@@ -197,13 +201,14 @@ class Standup(object):
         if self._owner and nick and self._owner != nick:
             self._send_msg(target, nick, 'Only {0} can stop the standup (he started it).'.format(self._owner))
             return
+        self._user_list = None
+        self._current_user = None
+        self._in_progress = False
         elapsed = int((time.time() - self._started) / 60)
         self._started = None
         self._server.privmsg(self._config['standup_channel'],
                 'All done! Standup was {0} minutes.'.format(elapsed))
-        self._user_list = None
-        self._current_user = None
-        self._in_progress = False
+        self._archives.write('*** Standup was {0} minutes'.format(elapsed))
         if self._parking:
             self._archives.write('Parked topics: ')
             self._server.privmsg(self._config['primary_channel'], 'Parked topics from "{0}" standup:'.format(self._name))
