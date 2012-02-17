@@ -32,7 +32,7 @@ class Standup(object):
             return
         if self._in_progress is True and event.target() == self._config['standup_channel']:
             # Archiving
-            nick = event.source().split('!')[0]
+            nick = event.source().split('!')[0].lower()
             self._archives.write('{0}: {1}'.format(nick, args[0]))
         if args[0].startswith(self._global_config['nick']):
             self._direct_message(event)
@@ -44,7 +44,7 @@ class Standup(object):
             # So we can spawn several standup easily
             return
         args = [arg for arg in event.arguments()[0].split(' ') if arg]
-        nick = event.source().split('!')[0]
+        nick = event.source().split('!')[0].lower()
         args.pop(0)
         if not args:
             return
@@ -104,7 +104,7 @@ class Standup(object):
                 return
             if event.target() != self._config['standup_channel']:
                 return
-            nick = event.source().split('!')[0]
+            nick = event.source().split('!')[0].lower()
             if nick not in nick_list:
                 nick_list.append(nick)
         self._irc.add_global_handler('pubmsg', gather_reply)
@@ -181,6 +181,8 @@ class Standup(object):
         to_skip = args[0].lower()
         if to_skip == self._current_user:
             self._cmd_next()
+            return
+        if to_skip not in self._user_list:
             return
         self._user_list.remove(to_skip)
         self._send_msg(target, nick, '{0} has been removed from the standup.'.format(to_skip))
