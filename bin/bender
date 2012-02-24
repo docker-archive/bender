@@ -4,7 +4,6 @@ import os
 import sys
 ROOT_DIR = os.path.dirname(__file__)
 sys.path.insert(1, os.path.join(ROOT_DIR, '..', 'lib'))
-print sys.path
 
 import bender
 
