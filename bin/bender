@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+
+import os
+import sys
+ROOT_DIR = os.path.dirname(__file__)
+sys.path.insert(1, os.path.join(ROOT_DIR, '..', 'lib'))
+print sys.path
+
+import bender
+
+
+if __name__ == '__main__':
+    config_path = os.path.join(ROOT_DIR, '..', 'config.yml')
+    bot = bender.Bender(config_path)
+    bot.run()
