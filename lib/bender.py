@@ -27,8 +27,6 @@ class Bender(object):
         for name in self._config['standups']:
             standup.Standup(name, irc, server, self._config, self._config['standups'][name]).run()
         # PagerDuty notifications
-        #print pagerduty.PagerDuty(irc, server, self._config)._get_rotation()
-        #import sys; sys.exit(0)
         pagerduty.PagerDuty(irc, server, self._config).run()
 
     def run(self):
