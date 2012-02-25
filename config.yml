@@ -1,7 +1,6 @@
 
 network: 'irc.freenode.net'
 port: 6667
-channels: '#irclib'
 nick: 'bender'
 name: 'DotCloud bot'
 channel: '#dotcloud-bender'
@@ -13,3 +12,15 @@ standups:
         primary_channel: '#dotcloud-bender'
         standup_channel: '#dotcloud-scrum-standup'
         warmup_duration: 60
+        speak_limit: 3
+
+pagerduty:
+    organization: 'acme'
+    auth: 'ops@acme.com:secret42'
+    schedules:
+        'OPS level 1': 'PUXRSGYX'
+        'OPS level 2': 'P5FU3J7'
+        'Support': 'XIJBP61'
+    users:
+        'jose@acme.com': 'jose1'
+        'pipo@acme.com': 'pipo42'
