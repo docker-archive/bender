@@ -1,7 +1,9 @@
 
-import signal
+import time
 import datetime
+import signal
 
+import pytz
 import requests
 import simplejson as json
 
@@ -39,12 +41,39 @@ class PagerDuty(object):
 
     def _announce_rotation(self, *args):
         rotation = self._get_rotation()
+        topic = []
         for label, user in rotation.iteritems():
+            topic.append('{0} ({1}) is on rotation "{2}"'.format(user['nick'],
+                user['name'].encode('utf8'), label))
             self._server.privmsg(user['nick'], 'You are on rotation "{0}"'.format(label))
             self._server.privmsg(self._global_config['channel'],
                     '* {0} ({1}) is on rotation "{2}"'.format(user['nick'],
                         user['name'].encode('utf8'), label))
+        # Set topic
+        topic = 'Today\'s rotation: {0}'.format(' // '.join(topic))
+        self._server.topic(self._global_config['channel'], topic)
+        # Check if we are called by a signal handler
+        if args:
+            return
+        # No, so let's reschedule the announcement
+        self._schedule_announcement()
+
+    def _schedule_announcement(self):
+        tz = pytz.timezone(self._global_config['timezone'])
+        dt = datetime.datetime.now(tz)
+        schedule = self._config['announce_hour']
+        if dt.hour < schedule:
+            td = datetime.timedelta(hours=(schedule - dt.hour),
+                    minutes=(-dt.minute), seconds=(-dt.second),
+                    microseconds=(-dt.microsecond))
+        else:
+            td = datetime.timedelta(hours=(24 - (dt.hour - schedule)),
+                    minutes=(-dt.minute), seconds=(-dt.second),
+                    microseconds=(-dt.microsecond))
+        dt += td
+        self._irc.execute_at(time.mktime(dt.timetuple()), self._announce_rotation)
 
     def run(self):
         # Register the rotation announcement on SIGUSR1
         signal.signal(signal.SIGUSR1, self._announce_rotation)
+        self._schedule_announcement()

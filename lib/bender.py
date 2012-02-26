@@ -1,5 +1,5 @@
 
-import os
+import select
 import irclib
 import yaml
 
@@ -42,4 +42,9 @@ class Bender(object):
                 ircname=self._config['name'])
         server.join(self._config['channel'])
         self._load_plugins(irc, server)
-        irc.process_forever()
+        while True:
+            try:
+                # Signals makes the select to exit
+                irc.process_forever()
+            except select.error:
+                pass
