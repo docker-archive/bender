@@ -70,8 +70,8 @@ class PagerDuty(object):
             td = datetime.timedelta(hours=(24 - (dt.hour - schedule)),
                     minutes=(-dt.minute), seconds=(-dt.second),
                     microseconds=(-dt.microsecond))
-        dt = pytz.localize(dt + td)
-        self._irc.execute_at(time.mktime(dt.timetuple()), self._announce_rotation)
+        total_seconds = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+        self._irc.execute_at(time.time() + total_seconds, self._announce_rotation)
 
     def run(self):
         # Register the rotation announcement on SIGUSR1
