@@ -43,7 +43,7 @@ class PagerDuty(object):
         rotation = self._get_rotation()
         topic = []
         for label, user in rotation.iteritems():
-            topic.append('{0} ({1}) is on rotation "{2}"'.format(user['nick'],
+            topic.append('{0} ({1}) is assigned to "{2}"'.format(user['nick'],
                 user['name'].encode('utf8'), label))
             self._server.privmsg(user['nick'], 'You are on rotation "{0}"'.format(label))
             self._server.privmsg(self._global_config['channel'],
@@ -70,7 +70,7 @@ class PagerDuty(object):
             td = datetime.timedelta(hours=(24 - (dt.hour - schedule)),
                     minutes=(-dt.minute), seconds=(-dt.second),
                     microseconds=(-dt.microsecond))
-        dt += td
+        dt = pytz.localize(dt + td)
         self._irc.execute_at(time.mktime(dt.timetuple()), self._announce_rotation)
 
     def run(self):
