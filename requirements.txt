@@ -1,5 +1,5 @@
 PyYAML
-python-irclib
+irc<1.0dev
 pytz
 requests
 simplejson

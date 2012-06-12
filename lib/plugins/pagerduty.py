@@ -71,7 +71,7 @@ class PagerDuty(object):
                     minutes=(-dt.minute), seconds=(-dt.second),
                     microseconds=(-dt.microsecond))
         total_seconds = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
-        self._irc.execute_at(time.time() + total_seconds, self._announce_rotation)
+        self._irc.execute_at(int(time.time() + total_seconds), self._announce_rotation)
 
     def run(self):
         # Register the rotation announcement on SIGUSR1

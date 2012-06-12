@@ -1,6 +1,6 @@
 
 import select
-import irclib
+from irc.client import IRC, all_events
 import yaml
 
 
@@ -30,9 +30,9 @@ class Bender(object):
         pagerduty.PagerDuty(irc, server, self._config).run()
 
     def run(self):
-        irc = irclib.IRC()
+        irc = IRC()
         # Will log all events to stdout
-        for event in irclib.all_events:
+        for event in all_events:
             self._set_print_handler(irc, event)
         server = irc.server()
         server.connect(

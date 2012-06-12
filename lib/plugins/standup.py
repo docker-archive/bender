@@ -131,7 +131,7 @@ class Standup(object):
                     'You start.')
             self._set_speak_timer()
             self._archives.write('*** Current: {0}'.format(self._current_user))
-        self._irc.execute_at(time.time() + self._config['warmup_duration'], start)
+        self._irc.execute_at(int(time.time() + self._config['warmup_duration']), start)
 
     def _set_speak_timer(self):
         nick = self._current_user
@@ -140,7 +140,7 @@ class Standup(object):
                 return
             self._send_msg(self._config['standup_channel'], self._current_user,
                     'Hurry up! You reached {0} minutes!'.format(self._config['speak_limit']))
-        self._irc.execute_at(time.time() + self._config['speak_limit'] * 60, warn_user)
+        self._irc.execute_at(int(time.time() + self._config['speak_limit'] * 60), warn_user)
 
     def _cmd_add(self, target, nick, args):
         """ Add a person to the standup (I won't check if the nick exists on the server) """
