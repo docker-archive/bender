@@ -20,6 +20,7 @@ class Standup(object):
         self._owner = None
         self._started = None
         self._parking = None
+        self._user_late_list = None
         self._user_list = None
         self._current_user = None
 
@@ -119,6 +120,7 @@ class Standup(object):
                         'Nobody replied, aborting the standup.')
                 return
             self._archives.new(self._name)
+            self._user_late_list = []
             self._parking = []
             self._server.privmsg(self._config['standup_channel'],
                     'Let\'s start the standup with {0}'.format(', '.join(nick_list)))
@@ -142,20 +144,26 @@ class Standup(object):
 
     def _cmd_add(self, target, nick, args):
         """ Add a person to the standup (I won't check if the nick exists on the server) """
+        if not args:
+            return
         if self._in_progress is False:
             self._send_msg(target, nick, 'No standup in progress.')
             return
-        if self._owner and nick and self._owner != nick:
+        to_add = args[0].lower()
+        if to_add == 'me':
+            to_add = nick
+        if nick and self._owner != nick and to_add != nick:
             self._send_msg(target, nick, 'Only {0} can add someone (he started the standup).'.format(self._owner))
             return
-        if not args:
-            return
-        to_add = args[0].lower()
         if to_add in self._user_list:
             self._send_msg(target, nick, '{0} is already part of the Standup.'.format(to_add))
             return
         # FIXME: Check if to_add exists for real
         self._user_list.append(to_add)
+        self._user_late_list.append(to_add)
+        if to_add == nick:
+            self._send_msg(target, nick, 'You\'re in.')
+            return
         self._send_msg(target, nick, 'Added {0}.'.format(to_add))
 
     def _cmd_next(self, target=None, nick=None, args=None):
@@ -221,7 +229,11 @@ class Standup(object):
         self._started = None
         self._server.privmsg(self._config['standup_channel'],
                 'All done! Standup was {0} minutes.'.format(elapsed))
+        user_late_list = ', '.join(self._user_late_list)
         self._archives.write('*** Standup was {0} minutes'.format(elapsed))
+        self._server.privmsg(self._config['primary_channel'], 'Late people on "{0}" standup: {1}'.format(
+            self._name, user_late_list))
+        self._archives.write('*** Late people: {0}'.format(user_late_list))
         if self._parking:
             self._archives.write('Parked topics: ')
             self._server.privmsg(self._config['primary_channel'], 'Parked topics from "{0}" standup:'.format(self._name))
