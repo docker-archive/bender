@@ -231,9 +231,10 @@ class Standup(object):
                 'All done! Standup was {0} minutes.'.format(elapsed))
         user_late_list = ', '.join(self._user_late_list)
         self._archives.write('*** Standup was {0} minutes'.format(elapsed))
-        self._server.privmsg(self._config['primary_channel'], 'Late people on "{0}" standup: {1}'.format(
-            self._name, user_late_list))
-        self._archives.write('*** Late people: {0}'.format(user_late_list))
+        if user_late_list:
+            self._server.privmsg(self._config['primary_channel'], 'Late people on "{0}" standup: {1}'.format(
+                self._name, user_late_list))
+            self._archives.write('*** Late people: {0}'.format(user_late_list))
         if self._parking:
             self._archives.write('Parked topics: ')
             self._server.privmsg(self._config['primary_channel'], 'Parked topics from "{0}" standup:'.format(self._name))
