@@ -6,10 +6,12 @@ import pytz
 
 class Archives(object):
 
-    def __init__(self, path, timezone=None):
+    def __init__(self, path, global_config, config):
         self._basepath = path
         self._timezone = None
         self._file = None
+
+        timezone = global_config.get('timezone')
         if timezone:
             self._timezone = pytz.timezone(timezone)
 
