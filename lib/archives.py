@@ -6,8 +6,9 @@ import pytz
 
 class DiskArchives(object):
 
-    def __init__(self, path, global_config, config):
-        self._basepath = path
+    def __init__(self, global_config, config):
+        self._basepath = os.path.join(os.path.expanduser(global_config['logs']),
+                'standup_archives')
         self._timezone = None
         self._file = None
 

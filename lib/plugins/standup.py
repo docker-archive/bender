@@ -8,9 +8,7 @@ class Standup(object):
 
     def __init__(self, name, irc, server, global_config, config):
         self._name = name
-        archives_path = os.path.join(os.path.expanduser(global_config['logs']),
-                'standup_archives')
-        self._archives = archives.DiskArchives(archives_path, global_config, config)
+        self._archives = archives.DiskArchives(global_config, config)
         self._irc = irc
         self._server = server
         self._global_config = global_config
