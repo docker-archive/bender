@@ -38,7 +38,8 @@ class DiskArchives(object):
         d = datetime.datetime.now(self._timezone)
         print >>self._file, '{0:02}:{1:02}:{2:02} {3}'.format(d.hour,
                 d.minute, d.second, string)
-        self._file.flush()
+        if self._file:
+            self._file.flush()
 
 
 class EmailDiskArchives(DiskArchives):
