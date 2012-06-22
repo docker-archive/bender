@@ -8,7 +8,7 @@ class Standup(object):
 
     def __init__(self, name, irc, server, global_config, config):
         self._name = name
-        self._archives = archives.DiskArchives(global_config, config)
+        self._archives = archives.EmailDiskArchives(global_config, config)
         self._irc = irc
         self._server = server
         self._global_config = global_config

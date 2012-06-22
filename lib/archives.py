@@ -2,6 +2,8 @@
 import os
 import datetime
 import pytz
+import smtplib
+from email.mime.text import MIMEText
 
 
 class DiskArchives(object):
@@ -25,7 +27,8 @@ class DiskArchives(object):
             os.makedirs(path)
         filename = '{0:02}-{1:02}-{2:02}_{3:02}:{4:02}_{5}.log'.format(
                 d.year, d.month, d.day, d.hour, d.minute, name)
-        self._file = file(os.path.join(path, filename), 'w')
+        # Mode 'wr+' required for EmailDiskArchives
+        self._file = file(os.path.join(path, filename), 'wr+')
 
     def close(self):
         if self._file:
@@ -36,3 +39,36 @@ class DiskArchives(object):
         print >>self._file, '{0:02}:{1:02}:{2:02} {3}'.format(d.hour,
                 d.minute, d.second, string)
         self._file.flush()
+
+
+class EmailDiskArchives(DiskArchives):
+    """Send standup logs to configurable email address"""
+
+    def __init__(self, global_config, config):
+        self._global_config = global_config
+        self._config = config
+
+        self._to = config.get('send_logs_to')
+        self._from = config.get('send_logs_from')
+        self._email_active = (self._to and self._from)    # Disable if not configured
+
+        DiskArchives.__init__(self, global_config, config)
+
+    def close(self):
+        if self._file and self._email_active:
+            self._file.seek(0)
+            log = self._file.read()
+
+            msg = MIMEText(log)
+            msg['Subject'] = 'Standup logs from {standup_channel}' \
+                .format(**self._config)
+            msg['From'] = self._from
+            msg['To'] = ",".join(self._to)
+
+            # TODO: Make SMTP options configurable
+            s = smtplib.SMTP('localhost')
+            s.sendmail(msg['From'], self._to, msg.as_string())
+            s.quit()
+
+        DiskArchives.close(self)
+
