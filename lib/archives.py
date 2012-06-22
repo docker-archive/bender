@@ -4,7 +4,7 @@ import datetime
 import pytz
 
 
-class Archives(object):
+class DiskArchives(object):
 
     def __init__(self, path, global_config, config):
         self._basepath = path
