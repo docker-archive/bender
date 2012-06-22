@@ -5,6 +5,7 @@ import pytz
 
 
 class DiskArchives(object):
+    """Archive standup logs to disk"""
 
     def __init__(self, global_config, config):
         self._basepath = os.path.join(os.path.expanduser(global_config['logs']),
