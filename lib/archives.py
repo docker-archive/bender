@@ -66,8 +66,8 @@ class EmailDiskArchives(DiskArchives):
             msg['From'] = self._from
             msg['To'] = ",".join(self._to)
 
-            # TODO: Make SMTP options configurable
-            s = smtplib.SMTP('localhost')
+            smtp_server = self._global_config.get('smtp_server', '127.0.0.1')
+            s = smtplib.SMTP(smtp_server)
             s.sendmail(msg['From'], self._to, msg.as_string())
             s.quit()
 

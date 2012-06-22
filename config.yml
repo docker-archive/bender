@@ -6,6 +6,7 @@ name: 'DotCloud bot'
 channel: '#dotcloud-bender'
 logs: '~/logs'
 timezone: 'US/Pacific'
+smtp_server: '127.0.0.1'
 
 standups:
     core:
