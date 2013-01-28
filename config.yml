@@ -21,7 +21,7 @@ standups:
 
 pagerduty:
     organization: 'acme'
-    auth: 'ops@acme.com:secret42'
+    apikey: 'E7px6VVr3PVHZPJq51oa'
     announce_hour: 10
     schedules:
         'OPS level 1': 'PUXRSGYX'

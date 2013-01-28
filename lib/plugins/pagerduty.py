@@ -8,8 +8,8 @@ import requests
 import simplejson as json
 
 
-PAGER_DUTY_URL=('https://{organization}.pagerduty.com/api/v1/schedules/'
-        '{schedule}/entries?since={date}T12:00:00-07&until={date}T12:00:00-07')
+PAGER_DUTY_URL=('https://{organization}.pagerduty.com/api/v1/schedules'
+        '{schedule}/entries?since={date}T12:00-07&until={date}T12:01-07')
 
 
 class PagerDuty(object):
@@ -28,7 +28,11 @@ class PagerDuty(object):
             url = PAGER_DUTY_URL.format(organization=self._config['organization'],
                     schedule=schedule,
                     date=date)
-            r = requests.get(url, auth=tuple(self._config['auth'].split(':')))
+            r = requests.get(url, headers={
+                'Authorization': 'Token token={0}'.format(self._config['apikey'])
+                })
+            if r.status_code != 200:
+                continue
             data = json.loads(r.text)
             if data['total'] < 1:
                 continue
@@ -41,6 +45,8 @@ class PagerDuty(object):
 
     def _announce_rotation(self, *args):
         rotation = self._get_rotation()
+        if not rotation:
+            return
         topic = []
         for label, user in rotation.iteritems():
             topic.append('{0} ({1}) is assigned to "{2}"'.format(user['nick'],
