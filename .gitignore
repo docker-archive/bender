@@ -1,2 +1,4 @@
 *.pyc
 htpasswd
+.dotcloud
+config_dotcloud.yml
