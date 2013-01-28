@@ -6,6 +6,7 @@ name: 'DotCloud bot'
 channel: '#dotcloud-bender'
 logs: '~/logs'
 timezone: 'US/Pacific'
+smtp_server: '127.0.0.1'
 
 standups:
     core:
@@ -13,6 +14,10 @@ standups:
         standup_channel: '#dotcloud-scrum-standup'
         warmup_duration: 60
         speak_limit: 3
+        send_logs_from:  'standup-list@acme.com'
+        send_logs_to:
+            - 'standup.list@acme.com'
+            - 'scrum.master@acme.com'
 
 pagerduty:
     organization: 'acme'
