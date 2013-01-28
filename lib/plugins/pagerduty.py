@@ -8,7 +8,7 @@ import requests
 import simplejson as json
 
 
-PAGER_DUTY_URL=('https://{organization}.pagerduty.com/api/v1/schedules'
+PAGER_DUTY_URL=('https://{organization}.pagerduty.com/api/v1/schedules/'
         '{schedule}/entries?since={date}T12:00-07&until={date}T12:01-07')
 
 
