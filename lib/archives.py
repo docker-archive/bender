@@ -2,6 +2,7 @@
 import os
 import datetime
 import pytz
+import socket
 import smtplib
 from email.mime.text import MIMEText
 
@@ -48,28 +49,26 @@ class EmailDiskArchives(DiskArchives):
     def __init__(self, global_config, config):
         self._global_config = global_config
         self._config = config
-
         self._to = config.get('send_logs_to')
         self._from = config.get('send_logs_from')
         self._email_active = (self._to and self._from)    # Disable if not configured
-
         DiskArchives.__init__(self, global_config, config)
 
     def close(self):
         if self._file and self._email_active:
             self._file.seek(0)
             log = self._file.read()
-
             msg = MIMEText(log)
             msg['Subject'] = 'Standup logs from {standup_channel}' \
                 .format(**self._config)
             msg['From'] = self._from
             msg['To'] = ",".join(self._to)
-
             smtp_server = self._global_config.get('smtp_server', '127.0.0.1')
-            s = smtplib.SMTP(smtp_server)
-            s.sendmail(msg['From'], self._to, msg.as_string())
-            s.quit()
-
+            try:
+                s = smtplib.SMTP(smtp_server)
+                s.sendmail(msg['From'], self._to, msg.as_string())
+                s.quit()
+            except socket.error as e:
+                print 'Warning: cannot send email report {0}'.format(e)
         DiskArchives.close(self)
 
