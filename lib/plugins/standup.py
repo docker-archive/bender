@@ -25,24 +25,24 @@ class Standup(object):
         self._irc.add_global_handler('pubmsg', self._event_pubmsg)
 
     def _event_pubmsg(self, conn, event):
-        args = event.arguments()
+        args = event.arguments
         if not args:
             return
-        if self._in_progress is True and event.target() == self._config['standup_channel']:
+        if self._in_progress is True and event.target == self._config['standup_channel']:
             # Archiving
-            nick = event.source().split('!')[0].lower()
+            nick = event.source.split('!')[0].lower()
             self._archives.write('{0}: {1}'.format(nick, args[0]))
         if args[0].startswith(self._global_config['nick']):
             self._direct_message(event)
 
     def _direct_message(self, event):
-        target = event.target()
+        target = event.target
         if target != self._config['standup_channel']:
             # Ignoring command outside the standup channel
             # So we can spawn several standup easily
             return
-        args = [arg for arg in event.arguments()[0].split(' ') if arg]
-        nick = event.source().split('!')[0].lower()
+        args = [arg for arg in event.arguments[0].split(' ') if arg]
+        nick = event.source.split('!')[0].lower()
         args.pop(0)
         if not args:
             return
@@ -86,7 +86,7 @@ class Standup(object):
         self._starting = True
         def list_users(conn, event):
             self._irc.remove_global_handler('namreply', list_users)
-            users = event.arguments().pop().split(' ')
+            users = event.arguments.pop().split(' ')
             users.pop(0)
             if self._global_config['nick'] in users:
                 users.remove(self._global_config['nick'])
@@ -100,9 +100,9 @@ class Standup(object):
         def gather_reply(conn, event):
             if self._starting is False:
                 return
-            if event.target() != self._config['standup_channel']:
+            if event.target != self._config['standup_channel']:
                 return
-            nick = event.source().split('!')[0].lower()
+            nick = event.source.split('!')[0].lower()
             if nick not in nick_list:
                 nick_list.append(nick)
         self._irc.add_global_handler('pubmsg', gather_reply)
