@@ -1,6 +1,7 @@
 
 import select
-from irc.client import IRC, all_events
+from irc.client import IRC
+from irc.events import all as all_events
 import yaml
 
 
@@ -15,9 +16,9 @@ class Bender(object):
         def print_callback(connection, ev):
             print '{0}, {1}, {2}: {3}'.format(
                     event,
-                    ev.source(),
-                    ev.target(),
-                    ' '.join(ev.arguments()),
+                    ev.source,
+                    ev.target,
+                    ' '.join(ev.arguments),
                     )
         irc.add_global_handler(event, print_callback)
 
