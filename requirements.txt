@@ -1,5 +1,5 @@
 PyYAML
-irc<1.0dev
+irc
 pytz==2013d
 requests
 simplejson
