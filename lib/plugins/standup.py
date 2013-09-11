@@ -23,20 +23,6 @@ class Standup(object):
 
     def _register_handlers(self):
         self._irc.add_global_handler('pubmsg', self._event_pubmsg)
-        self._irc.add_global_handler('privnotice', self._event_notice)
-        
-    def _event_notice(self, conn, event):
-        args = event.arguments
-        if not args:
-            return
-        nick = event.source.split('!')[0].lower()
-        if nick == "nickserv":
-            if 'registered' in ''.join(args):
-                self._server.privmsg(nick, 'identify {0}'.format(self._global_config.get('password')))
-            else:
-                print event.arguments
-            
-
 
     def _event_pubmsg(self, conn, event):
         args = event.arguments
