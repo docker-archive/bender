@@ -41,7 +41,7 @@ class Bender(object):
                 self._config['port'],
                 self._config['nick'],
                 ircname=self._config['name'])
-        server.join(self._config['channel'])
+        server.join(self._config['channel'], key=self._config.get('channel_password', ''))
         self._load_plugins(irc, server)
         while True:
             try:
@@ -53,7 +53,7 @@ class Bender(object):
         # handle private messages, to see if there's a need for
         # authentification requests 
         irc.add_global_handler('privnotice', self._event_notice)
-        
+
     def _event_notice(self, conn, event):
         args = event.arguments
         if not args:

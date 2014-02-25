@@ -254,5 +254,7 @@ class Standup(object):
 
     def run(self):
         self._register_handlers()
-        self._server.join(self._config['primary_channel'])
-        self._server.join(self._config['standup_channel'])
+        self._server.join(self._config['primary_channel'],
+                          key=self._config.get('primary_channel_password', ''))
+        self._server.join(self._config['standup_channel'],
+                          key=self._config.get('standup_channel_password', ''))

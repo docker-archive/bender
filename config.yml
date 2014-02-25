@@ -4,6 +4,7 @@ port: 6667
 nick: 'bender'
 name: 'DotCloud bot'
 channel: '#dotcloud-bender'
+channel_password: 'somepassword!'
 logs: '~/logs'
 timezone: 'US/Pacific'
 smtp_server: '127.0.0.1'
@@ -12,7 +13,9 @@ password: 'somepassword!'
 standups:
     core:
         primary_channel: '#dotcloud-bender'
+        primary_channel_password: 'somepassword!'
         standup_channel: '#dotcloud-scrum-standup'
+        standup_channel_password: 'somepassword!'
         warmup_duration: 60
         speak_limit: 3
         logfile_name: 'standup'
