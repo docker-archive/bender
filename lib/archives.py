@@ -12,7 +12,7 @@ class DiskArchives(object):
 
     def __init__(self, global_config, config):
         self._basepath = os.path.join(os.path.expanduser(global_config['logs']),
-                config.get('logfile_name'))
+                config.get('logfile_name', 'standup_archives'))
 
         self._timezone = None
         self._file = None
