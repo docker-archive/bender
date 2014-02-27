@@ -2,3 +2,5 @@
 htpasswd
 .dotcloud
 config_dotcloud.yml
+postinstall
+s3cfg

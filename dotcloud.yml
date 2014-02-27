@@ -1,2 +1,4 @@
 bot:
     type: python
+    systempackages:
+        - s3cmd
