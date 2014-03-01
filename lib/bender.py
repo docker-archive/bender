@@ -14,11 +14,12 @@ class Bender(object):
     def _set_print_handler(self, irc, event):
         """ Print an event on stdout """
         def print_callback(connection, ev):
-            print u'{0}, {1}, {2}: {3}'.format(
-                    event,
-                    ev.source,
-                    ev.target,
-                    u' '.join(ev.arguments),
+            args = [arg.encode('ascii', 'replace') for arg in ev.arguments]
+            print '{0}, {1}, {2}: {3}'.format(
+                    event.encode('ascii', 'replace'),
+                    ev.source.encode('ascii', 'replace'),
+                    ev.target.encode('ascii', 'replace'),
+                    ' '.join(args),
                     )
         irc.add_global_handler(event, print_callback)
 

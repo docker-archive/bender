@@ -50,11 +50,11 @@ class PagerDuty(object):
         topic = []
         for label, user in rotation.iteritems():
             topic.append('{0} ({1}) is assigned to "{2}"'.format(user['nick'],
-                user['name'].encode('utf8'), label))
+                user['name'].encode('ascii', 'replace'), label))
             self._server.privmsg(user['nick'], 'You are on rotation "{0}"'.format(label))
             self._server.privmsg(self._global_config['channel'],
                     '* {0} ({1}) is on rotation "{2}"'.format(user['nick'],
-                        user['name'].encode('utf8'), label))
+                        user['name'].encode('ascii', 'replace'), label))
         # Set topic
         topic = 'Today\'s rotation: {0}'.format(' // '.join(topic))
         self._server.topic(self._global_config['channel'], topic)
