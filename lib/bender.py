@@ -16,9 +16,9 @@ class Bender(object):
         def print_callback(connection, ev):
             args = [arg.encode('ascii', 'replace') for arg in ev.arguments]
             print '{0}, {1}, {2}: {3}'.format(
-                    event.encode('ascii', 'replace'),
-                    ev.source.encode('ascii', 'replace'),
-                    ev.target.encode('ascii', 'replace'),
+                    event,
+                    ev.source,
+                    ev.target,
                     ' '.join(args),
                     )
         irc.add_global_handler(event, print_callback)
