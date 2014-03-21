@@ -31,7 +31,8 @@ class Standup(object):
         if self._in_progress is True and event.target == self._config['standup_channel']:
             # Archiving
             nick = event.source.split('!')[0].lower()
-            self._archives.write('{0}: {1}'.format(nick, args[0]))
+            self._archives.write('{0}: {1}'.format(nick.encode('ascii', 'replace'),
+                                                   args[0].encode('ascii', 'replace')))
         if args[0].startswith(self._global_config['nick']):
             self._direct_message(event)
 
