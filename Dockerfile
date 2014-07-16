@@ -1,13 +1,10 @@
-from ubuntu:12.04
-maintainer Nick Stinemates
+from python:2.7
+maintainer Sam Alba <sam@docker.com>
 
-run apt-get install -y python-setuptools
-run easy_install pip
-volume /logs
+add . /code
+workdir /code
 
-add . /bot
-workdir /bot
+run curl https://bootstrap.pypa.io/get-pip.py | python
+run pip install -r requirements.txt
 
-run pip install -r /bot/requirements.txt
-
-cmd ["python", "bin/bender"]
+cmd ["bin/bender"]

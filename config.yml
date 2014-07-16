@@ -1,7 +1,7 @@
 
 network: 'irc.freenode.net'
 port: 6667
-nick: 'bender'
+nick: 'bender__'
 name: 'DotCloud bot'
 channel: '#dotcloud-bender'
 channel_password: 'somepassword!'
