@@ -29,7 +29,8 @@ class Bender(object):
         for name in self._config['standups']:
             standup.Standup(name, irc, server, self._config, self._config['standups'][name]).run()
         # PagerDuty notifications
-        pagerduty.PagerDuty(irc, server, self._config).run()
+        if 'pagerduty' in self._config:
+            pagerduty.PagerDuty(irc, server, self._config).run()
 
     def run(self):
         irc = IRC()
