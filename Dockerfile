@@ -7,4 +7,6 @@ workdir /code
 run curl https://bootstrap.pypa.io/get-pip.py | python
 run pip install -r requirements.txt
 
+env PYTHONUNBUFFERED true
+
 cmd ["bin/bender"]
