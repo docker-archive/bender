@@ -1,7 +1,9 @@
 
 import select
 from irc.client import IRC
+from irc.connection import Factory
 from irc.events import all as all_events
+import ssl
 import yaml
 
 
@@ -38,11 +40,16 @@ class Bender(object):
         for event in all_events:
             self._set_print_handler(irc, event)
         server = irc.server()
+        if self._config.get('ssl'):
+            factory = Factory(wrapper=ssl.wrap_socket)
+        else:
+            factory = Factory()
         server.connect(
                 self._config['network'],
                 self._config['port'],
                 self._config['nick'],
                 ircname=self._config['name'],
+                connect_factory=factory,
                 password=self._config.get('password'))
         server.join(self._config['channel'], key=self._config.get('channel_password', ''))
         self._load_plugins(irc, server)

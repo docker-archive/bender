@@ -10,6 +10,7 @@ timezone: 'US/Pacific'
 smtp_server: '127.0.0.1'
 password: 'somepassword!'
 nickserv_password: 'somepassword!'
+ssl: false
 
 standups:
     core:
