@@ -1,7 +1,9 @@
 
 import select
 from irc.client import IRC
+from irc.connection import Factory
 from irc.events import all as all_events
+import ssl
 import yaml
 
 
@@ -38,11 +40,17 @@ class Bender(object):
         for event in all_events:
             self._set_print_handler(irc, event)
         server = irc.server()
+        if self._config.get('ssl'):
+            factory = Factory(wrapper=ssl.wrap_socket)
+        else:
+            factory = Factory()
         server.connect(
                 self._config['network'],
                 self._config['port'],
                 self._config['nick'],
-                ircname=self._config['name'])
+                ircname=self._config['name'],
+                connect_factory=factory,
+                password=self._config.get('password'))
         server.join(self._config['channel'], key=self._config.get('channel_password', ''))
         self._load_plugins(irc, server)
         while True:
@@ -57,10 +65,12 @@ class Bender(object):
         irc.add_global_handler('privnotice', self._event_notice)
 
     def _event_notice(self, conn, event):
+        if not self._global_config.get('nickserv_password'):
+            return
         args = event.arguments
         if not args:
             return
         nick = event.source.split('!')[0].lower()
         if nick == "nickserv":
             if 'registered' in ''.join(args):
-                self._server.privmsg(nick, 'identify {0}'.format(self._global_config.get('password')))
+                self._server.privmsg(nick, 'identify {0}'.format(self._global_config.get('nickserv_password')))
