@@ -1,4 +1,4 @@
-PyYAML==3.10
+PyYAML==5.1
 irc
 pytz==2013.9
 requests==2.2.1
